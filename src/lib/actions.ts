@@ -51,6 +51,7 @@ export async function createStudent(prevState: State, formData: FormData) {
   try {
     await addStudent(validatedFields.data);
   } catch (error) {
+    console.error(error);
     return {
       message: 'Database Error: Failed to create student.',
     };
