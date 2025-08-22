@@ -1,5 +1,7 @@
+
 import type { Student } from '@/types';
 
+// In-memory array to store students
 let students: Student[] = [
   {
     id: '1',
@@ -52,14 +54,16 @@ let students: Student[] = [
   },
 ];
 
+// Simulate API latency
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export const getStudents = async (): Promise<Student[]> => {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await delay(500);
   return Promise.resolve(students);
 };
 
 export const addStudent = async (studentData: Omit<Student, 'id'>): Promise<Student> => {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await delay(500);
   const newStudent: Student = {
     ...studentData,
     id: (students.length + 1).toString(),
