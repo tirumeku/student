@@ -10,12 +10,23 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model User {
+  id          String   @id @default(uuid())
+  firstName   String
+  lastName    String
+  phoneNumber String   @unique
+  email       String   @unique
+  password    String // In a real app, this should be a hash
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Student {
-  id        String   @id @default(cuid())
-  name      String
-  studentId String   @unique
-  course    String
-  interests String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(uuid())
+    name      String
+    studentId String   @unique
+    course    String
+    interests String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

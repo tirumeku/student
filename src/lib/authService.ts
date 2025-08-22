@@ -1,8 +1,22 @@
 
 'use server';
 
-// NOTE: In a real app, you would want to move the base URL to an environment variable.
-const AUTH_API_URL = 'http://127.0.0.1:5160/api/Auth';
+import { prisma } from './db';
+import { z } from 'zod';
+import { User } from '@prisma/client';
+
+const RegisterSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  phoneNumber: z.string().min(10, 'Phone number is required'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+const LoginSchema = z.object({
+    phoneNumber: z.string().min(10, 'Phone number is required'),
+    password: z.string().min(6, 'Password is required'),
+});
 
 export async function registerUser(userData: {
   firstName: string;
@@ -11,23 +25,53 @@ export async function registerUser(userData: {
   email: string;
   password: string;
 }) {
+  const validatedFields = RegisterSchema.safeParse(userData);
+
+  if (!validatedFields.success) {
+    return {
+      isSuccess: false,
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Invalid fields provided.',
+    };
+  }
+  
   try {
-    const response = await fetch(`${AUTH_API_URL}/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
+    const existingUser = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: validatedFields.data.email },
+                { phoneNumber: validatedFields.data.phoneNumber },
+            ]
+        }
     });
 
-    const result = await response.json();
-    return result;
+    if (existingUser) {
+        return {
+            isSuccess: false,
+            errors: { email: ['User with this email or phone number already exists.'] },
+            message: 'User already exists.'
+        }
+    }
+
+    const user = await prisma.user.create({
+      data: {
+        ...validatedFields.data,
+        // In a real app, hash the password before saving
+      },
+    });
+
+    return {
+      isSuccess: true,
+      accessToken: 'dummy-jwt-for-' + user.id, // Replace with real JWT logic
+      refreshToken: 'dummy-refresh-token',
+      errors: null,
+    };
   } catch (error: any) {
     return {
       isSuccess: false,
       accessToken: null,
       refreshToken: null,
-      errors: [error.message || 'An unknown network error occurred.'],
+      errors: [error.message || 'An unknown error occurred.'],
     };
   }
 }
@@ -39,56 +83,58 @@ export async function login({
   phoneNumber: string;
   password: string;
 }) {
-  try {
-    const response = await fetch(`${AUTH_API_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ phoneNumber, password }),
-    });
-    
-    const result = await response.json();
-    return result;
 
+    const validatedFields = LoginSchema.safeParse({ phoneNumber, password });
+    
+    if (!validatedFields.success) {
+        return {
+            isSuccess: false,
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Invalid fields provided.'
+        }
+    }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { phoneNumber },
+    });
+
+    if (!user || user.password !== password) { // In real app, compare hashed passwords
+      return {
+        isSuccess: false,
+        accessToken: null,
+        refreshToken: null,
+        errors: ['Invalid phone number or password.'],
+      };
+    }
+
+    return {
+      isSuccess: true,
+      accessToken: 'dummy-jwt-for-' + user.id, // Replace with real JWT logic
+      refreshToken: 'dummy-refresh-token',
+      errors: null,
+    };
   } catch (error: any) {
     return {
       isSuccess: false,
       accessToken: null,
       refreshToken: null,
-      errors: [error.message || 'An unknown network error occurred.'],
+      errors: [error.message || 'An unknown server error occurred.'],
     };
   }
 }
 
 export async function logout(token: string, refreshToken: string) {
-  try {
-    const response = await fetch(`${AUTH_API_URL}/logout`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token, refreshToken }),
-    });
-    const result = await response.json();
-    return result;
-  } catch (error: any) {
-    return { isSuccess: false, errors: [error.message] };
-  }
+    // In a real app, you might want to invalidate tokens here.
+    return { isSuccess: true, errors: null };
 }
 
 export async function refreshToken(token: string, refreshToken: string) {
-    try {
-        const response = await fetch(`${AUTH_API_URL}/refresh-token`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ token, refreshToken }),
-        });
-        const result = await response.json();
-        return result;
-    } catch (error: any) {
-        return { isSuccess: false, errors: [error.message] };
-    }
+    // In a real app, you would validate the refresh token and issue a new access token.
+    return { 
+        isSuccess: true,
+        accessToken: 'new-dummy-jwt',
+        refreshToken: 'new-dummy-refresh-token',
+        errors: null 
+    };
 }
