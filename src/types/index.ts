@@ -1,4 +1,6 @@
 
+import type { Timestamp } from 'firebase/firestore';
+
 export type Student = {
     id: string;
     name: string;
@@ -7,4 +9,10 @@ export type Student = {
     interests: string;
     createdAt: Date;
     updatedAt: Date;
+};
+
+// This type is used for Firestore operations, as it uses Timestamps
+export type StudentFirestore = Omit<Student, 'id' | 'createdAt' | 'updatedAt'> & {
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
 };
