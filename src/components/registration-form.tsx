@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useFormStatus } from 'react-dom';
 import { createStudent, type State } from '@/lib/actions';
 import {
@@ -50,96 +50,100 @@ export function RegistrationForm() {
       course: '',
       interests: '',
     },
-    // To show server-side errors
-    errors: state.errors
-      ? (Object.fromEntries(
-          Object.entries(state.errors).map(([key, value]) => [
-            key,
-            { type: 'manual', message: value[0] },
-          ])
-        ) as any)
-      : {},
   });
 
+  useEffect(() => {
+    if (state.errors) {
+      Object.entries(state.errors).forEach(([key, value]) => {
+        form.setError(key as keyof z.infer<typeof formSchema>, {
+          type: 'manual',
+          message: value[0],
+        });
+      });
+    }
+  }, [state.errors, form]);
+
   return (
-    <form action={dispatch} className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. Jane Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="studentId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Student ID</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. STU12345" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <Form {...form}>
+      <form action={dispatch} className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Jane Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="studentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Student ID</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. STU12345" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="course"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Course</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Computer Science" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="course"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Course</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g. Computer Science" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </div>
-      <FormField
-        control={form.control}
-        name="interests"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Interests</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Describe the student's interests, hobbies, or skills. This will be used for AI recommendations."
-                className="resize-none"
-                {...field}
-              />
-            </FormControl>
-            <FormDescription>
-              Provide details that could help in recommending activities.
-            </FormDescription>
-            <FormMessage />
-          </FormItem>
+        <FormField
+          control={form.control}
+          name="interests"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Interests</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Describe the student's interests, hobbies, or skills. This will be used for AI recommendations."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Provide details that could help in recommending activities.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {state.message && (
+          <Alert variant="destructive">
+            <Terminal className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{state.message}</AlertDescription>
+          </Alert>
         )}
-      />
 
-      {state.message && (
-        <Alert variant="destructive">
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{state.message}</AlertDescription>
-        </Alert>
-      )}
-
-      <div className="flex justify-end">
-        <SubmitButton />
-      </div>
-    </form>
+        <div className="flex justify-end">
+          <SubmitButton />
+        </div>
+      </form>
+    </Form>
   );
 }
