@@ -17,7 +17,7 @@ import { Terminal } from 'lucide-react';
 import { login } from '@/lib/authService';
 
 export default function LoginPage() {
-  const [phoneNumber, setPhoneNumber] = useState('09189736223');
+  const [phoneNumber, setPhoneNumber] = useState('0989736223');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
