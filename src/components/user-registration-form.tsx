@@ -10,6 +10,9 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Terminal } from 'lucide-react';
 
 export function UserRegistrationForm() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +25,18 @@ export function UserRegistrationForm() {
     setError(null);
     setSuccess(false);
 
-    const response = await registerUser(email, password);
+    const response = await registerUser({
+      firstName,
+      lastName,
+      phoneNumber,
+      email,
+      password,
+    });
     if (response.isSuccess) {
       setSuccess(true);
+      setFirstName('');
+      setLastName('');
+      setPhoneNumber('');
       setEmail('');
       setPassword('');
     } else {
@@ -35,6 +47,36 @@ export function UserRegistrationForm() {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="firstName">First Name</Label>
+          <Input
+            id="firstName"
+            placeholder="John"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="lastName">Last Name</Label>
+          <Input
+            id="lastName"
+            placeholder="Doe"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="phoneNumber">Phone Number</Label>
+        <Input
+          id="phoneNumber"
+          type="tel"
+          placeholder="09123456789"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+      </div>
       <div className="grid gap-2">
         <Label htmlFor="email">Email</Label>
         <Input
