@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -21,17 +22,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setResult(null);
     try {
       const response = await login({ phoneNumber, password });
       if (response.isSuccess) {
-        setResult(response);
+        // On successful login, redirect to the dashboard
+        router.push('/');
       } else {
         setError(response.errors?.join(', ') || 'An unknown error occurred.');
       }
@@ -82,16 +83,6 @@ export default function LoginPage() {
                 <AlertTitle>Error</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
-            )}
-            {result && result.isSuccess && (
-                <Alert>
-                    <Terminal className="h-4 w-4" />
-                    <AlertTitle>Login Successful</AlertTitle>
-                    <AlertDescription>
-                        <p className="break-all">Access Token: {result.accessToken}</p>
-                        <p className="break-all">Refresh Token: {result.refreshToken}</p>
-                    </AlertDescription>
-                </Alert>
             )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
