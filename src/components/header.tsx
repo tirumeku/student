@@ -19,8 +19,11 @@ export function Header() {
     { href: '/', label: 'Dashboard' },
     { href: '/students', label: 'Students' },
     { href: '/settings', label: 'Settings' },
-    { href: '/login', label: 'Login' },
   ];
+
+  if (pathname === '/login') {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">

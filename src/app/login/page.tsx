@@ -31,7 +31,6 @@ export default function LoginPage() {
     try {
       const response = await login({ phoneNumber, password });
       if (response.isSuccess) {
-        // On successful login, redirect to the dashboard
         router.push('/');
       } else {
         setError(response.errors?.join(', ') || 'An unknown error occurred.');
@@ -44,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center h-[calc(100vh-4rem)]">
+    <div className="flex justify-center items-center h-screen">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl font-headline">Login</CardTitle>
