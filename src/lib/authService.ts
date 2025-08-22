@@ -1,7 +1,18 @@
 'use server';
 
 import { z } from 'zod';
-import { prisma } from './db';
+
+// Mock user data store
+const users = [
+  {
+    id: 'b1e55c84-9055-4eb5-8bd4-a262538f7e66',
+    firstName: 'Admin',
+    lastName: 'User',
+    phoneNumber: '0989736223',
+    email: 'admin@example.com',
+    password: 'password', // In a real app, use a hashed password
+  },
+];
 
 const RegisterSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -12,8 +23,8 @@ const RegisterSchema = z.object({
 });
 
 const LoginSchema = z.object({
-    phoneNumber: z.string().min(10, 'Phone number is required'),
-    password: z.string().min(6, 'Password is required'),
+  phoneNumber: z.string().min(10, 'Phone number is required'),
+  password: z.string().min(6, 'Password is required'),
 });
 
 export async function registerUser(userData: {
@@ -33,32 +44,29 @@ export async function registerUser(userData: {
     };
   }
 
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { email: validatedFields.data.email },
-        { phoneNumber: validatedFields.data.phoneNumber },
-      ],
-    },
-  });
-
+  const { email, phoneNumber } = validatedFields.data;
+  const existingUser = users.find(
+    (u) => u.email === email || u.phoneNumber === phoneNumber
+  );
 
   if (existingUser) {
-      return {
-          isSuccess: false,
-          errors: { general: ['User with this email or phone number already exists.'] },
-          message: 'User already exists.'
-      }
+    return {
+      isSuccess: false,
+      errors: { general: ['User with this email or phone number already exists.'] },
+      message: 'User already exists.',
+    };
+  }
+  
+  const newUser = {
+      id: crypto.randomUUID(),
+      ...validatedFields.data
   }
 
-  const newUser = await prisma.user.create({
-    data: validatedFields.data
-  })
-
+  users.push(newUser);
 
   return {
     isSuccess: true,
-    accessToken: 'dummy-jwt-for-' + newUser.id, // Replace with real JWT logic
+    accessToken: 'dummy-jwt-for-' + newUser.id,
     refreshToken: 'dummy-refresh-token',
     errors: null,
   };
@@ -71,22 +79,16 @@ export async function login({
   phoneNumber: string;
   password: string;
 }) {
+  const validatedFields = LoginSchema.safeParse({ phoneNumber, password });
 
-    const validatedFields = LoginSchema.safeParse({ phoneNumber, password });
-    
-    if (!validatedFields.success) {
-        return {
-            isSuccess: false,
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Invalid fields provided.'
-        }
-    }
+  if (!validatedFields.success) {
+    return {
+      isSuccess: false,
+      errors: { general: ['Invalid fields provided.'] },
+    };
+  }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      phoneNumber: phoneNumber
-    }
-  })
+  const user = users.find((u) => u.phoneNumber === phoneNumber);
 
   if (!user || user.password !== password) {
     return {
@@ -103,19 +105,4 @@ export async function login({
     refreshToken: 'dummy-refresh-token',
     errors: null,
   };
-}
-
-export async function logout(token: string, refreshToken: string) {
-    // In a real app, you might want to invalidate tokens here.
-    return { isSuccess: true, errors: null };
-}
-
-export async function refreshToken(token: string, refreshToken: string) {
-    // In a real app, you would validate the refresh token and issue a new access token.
-    return { 
-        isSuccess: true,
-        accessToken: 'new-dummy-jwt',
-        refreshToken: 'new-dummy-refresh-token',
-        errors: null 
-    };
 }
