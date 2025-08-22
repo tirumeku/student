@@ -7,7 +7,7 @@ let students: Student[] = [
     name: 'Alice Johnson',
     studentId: 'STU001',
     course: 'Computer Science',
-    interests: 'AI, machine learning, and web development.',
+    interests: 'Loves coding, hiking, and playing the guitar. Interested in AI and web development.',
     createdAt: new Date('2023-09-01T10:00:00Z'),
     updatedAt: new Date('2023-09-01T10:00:00Z'),
   },
@@ -16,7 +16,7 @@ let students: Student[] = [
     name: 'Bob Williams',
     studentId: 'STU002',
     course: 'Business Administration',
-    interests: 'Entrepreneurship, marketing, and finance.',
+    interests: 'Enjoys public speaking, marketing, and chess. Looking to join a business club.',
     createdAt: new Date('2023-09-02T11:30:00Z'),
     updatedAt: new Date('2023-09-02T11:30:00Z'),
   },
@@ -25,48 +25,52 @@ let students: Student[] = [
     name: 'Charlie Brown',
     studentId: 'STU003',
     course: 'Graphic Design',
-    interests: 'UI/UX design, illustration, and branding.',
-    createdAt: new Date('2023-09-03T09:15:00Z'),
-    updatedAt: new Date('2023-09-03T09:15:00Z'),
+    interests: 'Passionate about digital art, typography, and photography. Member of the art club.',
+    createdAt: new Date('2023-09-03T14:15:00Z'),
+    updatedAt: new Date('2023-09-03T14:15:00Z'),
   },
   {
     id: '4',
-    name: 'Diana Prince',
+    name: 'Diana Miller',
     studentId: 'STU004',
     course: 'Mechanical Engineering',
-    interests: 'Robotics, 3D printing, and sustainable energy.',
-    createdAt: new Date('2023-09-04T14:00:00Z'),
-    updatedAt: new Date('2023-09-04T14:00:00Z'),
+    interests: 'Fascinated by robotics, 3D printing, and sustainable energy. Always in the workshop.',
+    createdAt: new Date('2023-09-04T09:05:00Z'),
+    updatedAt: new Date('2023-09-04T09:05:00Z'),
   },
   {
     id: '5',
-    name: 'Ethan Hunt',
+    name: 'Ethan Davis',
     studentId: 'STU005',
-    course: 'Computer Science',
-    interests: 'Cybersecurity, ethical hacking, and cryptography.',
+    course: 'Psychology',
+    interests: 'Interested in cognitive psychology, volunteering, and playing the piano.',
     createdAt: new Date('2023-09-05T16:45:00Z'),
     updatedAt: new Date('2023-09-05T16:45:00Z'),
   },
 ];
 
-// Simulate async data fetching
 export const getStudents = async (): Promise<Student[]> => {
-  // Sort by createdAt descending to show newest first
+  // Simulate async delay
+  await new Promise(resolve => setTimeout(resolve, 50));
+  // Return a sorted copy
   return [...students].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 };
 
-export const addStudent = async (studentData: Omit<Student, 'id' | 'createdAt' | 'updatedAt'>): Promise<Student> => {
+export const addStudent = async (studentData: { name: string; studentId: string; course: string; interests: string }): Promise<Student> => {
+  // Simulate async delay
+  await new Promise(resolve => setTimeout(resolve, 50));
   const newStudent: Student = {
+    id: crypto.randomUUID(),
     ...studentData,
-    id: (students.length + 1).toString(),
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  students.push(newStudent);
+  students.unshift(newStudent); // Add to the beginning to keep the list sorted by creation date
   return newStudent;
 };
 
 export const getStudentById = async (id: string): Promise<Student | null> => {
-  const student = students.find((s) => s.id === id);
-  return student || null;
-};
+    // Simulate async delay
+  await new Promise(resolve => setTimeout(resolve, 50));
+  return students.find(student => student.id === id) || null;
+}
