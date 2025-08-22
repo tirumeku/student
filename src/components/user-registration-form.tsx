@@ -25,24 +25,32 @@ export function UserRegistrationForm() {
     setError(null);
     setSuccess(false);
 
-    const response = await registerUser({
-      firstName,
-      lastName,
-      phoneNumber,
-      email,
-      password,
-    });
-    if (response.isSuccess) {
-      setSuccess(true);
-      setFirstName('');
-      setLastName('');
-      setPhoneNumber('');
-      setEmail('');
-      setPassword('');
-    } else {
-      setError(response.errors?.join(', ') || 'An unknown error occurred.');
+    try {
+      const response = await registerUser({
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        password,
+      });
+
+      if (response.isSuccess) {
+        setSuccess(true);
+        // Reset form
+        setFirstName('');
+        setLastName('');
+        setPhoneNumber('');
+        setEmail('');
+        setPassword('');
+      } else {
+        const errorMessages = Object.values(response.errors || {}).flat().join(' ');
+        setError(errorMessages || response.message || 'An unknown error occurred.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -55,6 +63,7 @@ export function UserRegistrationForm() {
             placeholder="John"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            required
           />
         </div>
         <div className="grid gap-2">
@@ -64,6 +73,7 @@ export function UserRegistrationForm() {
             placeholder="Doe"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            required
           />
         </div>
       </div>
@@ -75,6 +85,7 @@ export function UserRegistrationForm() {
           placeholder="09123456789"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
+          required
         />
       </div>
       <div className="grid gap-2">
@@ -85,6 +96,7 @@ export function UserRegistrationForm() {
           placeholder="john.doe@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
       </div>
       <div className="grid gap-2">
@@ -94,6 +106,7 @@ export function UserRegistrationForm() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
       </div>
       {error && (
