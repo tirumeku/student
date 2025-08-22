@@ -6,7 +6,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
 } from 'firebase/auth';
 
 // NOTE: This is a simplified example. In a real app, you'd want to handle
@@ -56,8 +55,4 @@ export async function logout() {
   } catch (error) {
     return { isSuccess: false, errors: [error.message] };
   }
-}
-
-export function observeAuthChanges(callback) {
-  return onAuthStateChanged(auth, callback);
 }
