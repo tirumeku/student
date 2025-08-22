@@ -1,19 +1,7 @@
-
 'use server';
 
 import { z } from 'zod';
-
-// Mock user data - in a real app, this would come from a database
-const users = [
-  {
-    id: 'b1e55c84-9055-4eb5-8bd4-a262538f7e66',
-    firstName: 'Admin',
-    lastName: 'User',
-    phoneNumber: '0989736223',
-    email: 'admin@example.com',
-    password: 'password', // In a real app, use a hashed password
-  }
-];
+import { prisma } from './db';
 
 const RegisterSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -44,10 +32,16 @@ export async function registerUser(userData: {
       message: 'Invalid fields provided.',
     };
   }
-  
-  const existingUser = users.find(
-    (user) => user.email === validatedFields.data.email || user.phoneNumber === validatedFields.data.phoneNumber
-  );
+
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: validatedFields.data.email },
+        { phoneNumber: validatedFields.data.phoneNumber },
+      ],
+    },
+  });
+
 
   if (existingUser) {
       return {
@@ -57,11 +51,10 @@ export async function registerUser(userData: {
       }
   }
 
-  const newUser = {
-    id: (users.length + 1).toString(),
-    ...validatedFields.data
-  };
-  users.push(newUser);
+  const newUser = await prisma.user.create({
+    data: validatedFields.data
+  })
+
 
   return {
     isSuccess: true,
@@ -89,9 +82,11 @@ export async function login({
         }
     }
 
-  const user = users.find(
-    (u) => u.phoneNumber === phoneNumber
-  );
+  const user = await prisma.user.findUnique({
+    where: {
+      phoneNumber: phoneNumber
+    }
+  })
 
   if (!user || user.password !== password) {
     return {

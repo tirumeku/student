@@ -1,24 +1,19 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 model User {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   firstName   String
   lastName    String
-  phoneNumber String   @unique
-  email       String   @unique
-  password    String // In a real app, this should be a hash
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  phoneNumber String @unique
+  email       String @unique
+  password    String // In a real app, you should hash passwords
 }
 
 model Student {
