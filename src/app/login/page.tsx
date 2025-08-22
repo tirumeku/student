@@ -17,8 +17,8 @@ import { Terminal } from 'lucide-react';
 import { login } from '@/lib/authService';
 
 export default function LoginPage() {
-  const [phoneNumber, setPhoneNumber] = useState('0989736223');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -28,7 +28,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await login({ phoneNumber, password });
+      const response = await login({ email, password });
       if (response.isSuccess) {
         setResult(response);
       } else {
@@ -53,15 +53,14 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="09123456789"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                readOnly 
               />
             </div>
             <div className="grid gap-2">

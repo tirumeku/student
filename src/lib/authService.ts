@@ -1,46 +1,63 @@
 
 'use server';
 
-const API_BASE_URL = 'http://localhost:5160/api/Auth';
+import { auth } from './firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from 'firebase/auth';
 
-interface AuthResponse {
-  isSuccess: boolean;
-  accessToken: string | null;
-  refreshToken: string | null;
-  errors: string[] | null;
+// NOTE: This is a simplified example. In a real app, you'd want to handle
+// errors more gracefully and securely.
+
+export async function registerUser(email, password) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    return { isSuccess: true, user: userCredential.user, errors: null };
+  } catch (error) {
+    return { isSuccess: false, user: null, errors: [error.message] };
+  }
 }
 
-export async function login({ phoneNumber, password }: { phoneNumber: string; password: string; }): Promise<AuthResponse> {
-  // The admin ID is fixed as requested.
-  const adminId = "b1e55c84-9055-4eb5-8bd4-a262538f7e66";
-
+export async function login({ email, password }) {
   try {
-    const response = await fetch(`${API_BASE_URL}/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ phoneNumber, password }),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json().catch(() => ({errors: ['Invalid response from server.']}));
-        return {
-            isSuccess: false,
-            accessToken: null,
-            refreshToken: null,
-            errors: errorData.errors || ['HTTP error! status: ' + response.status],
-        };
-    }
-
-    const data: AuthResponse = await response.json();
-    return data;
-  } catch (error: any) {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const idToken = await userCredential.user.getIdToken();
+    return {
+      isSuccess: true,
+      accessToken: idToken,
+      refreshToken: userCredential.user.refreshToken,
+      errors: null,
+    };
+  } catch (error) {
     return {
       isSuccess: false,
       accessToken: null,
       refreshToken: null,
-      errors: [error.message || 'An unexpected error occurred.'],
+      errors: [error.message],
     };
   }
+}
+
+export async function logout() {
+  try {
+    await signOut(auth);
+    return { isSuccess: true, errors: null };
+  } catch (error) {
+    return { isSuccess: false, errors: [error.message] };
+  }
+}
+
+export function observeAuthChanges(callback) {
+  return onAuthStateChanged(auth, callback);
 }
