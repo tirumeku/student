@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { useMemo } from 'react';
+import { format } from 'date-fns';
 
 interface DashboardStatsProps {
   students: Student[];
@@ -135,6 +136,7 @@ export function DashboardStats({ students }: DashboardStatsProps) {
                 <TableHead>Name</TableHead>
                 <TableHead>Student ID</TableHead>
                 <TableHead className="hidden md:table-cell">Course</TableHead>
+                <TableHead className="hidden md:table-cell">Date Added</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -144,6 +146,9 @@ export function DashboardStats({ students }: DashboardStatsProps) {
                   <TableCell>{student.studentId}</TableCell>
                   <TableCell className="hidden md:table-cell">
                     {student.course}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {format(new Date(student.createdAt), 'PPP')}
                   </TableCell>
                 </TableRow>
               ))}

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown, BrainCircuit, Loader2 } from 'lucide-react';
+import { ArrowUpDown, BrainCircuit } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -24,6 +24,7 @@ import { getAIRecommendation } from '@/lib/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import type { ActivityRecommenderOutput } from '@/ai/flows/activity-recommender';
 import { Skeleton } from './ui/skeleton';
+import { format } from 'date-fns';
 
 interface StudentTableProps {
   students: Student[];
@@ -34,7 +35,7 @@ type SortKey = keyof Student | '';
 export const StudentTable: FC<StudentTableProps> = ({
   students: initialStudents,
 }) => {
-  const [students, setStudents] = useState<Student[]>(initialStudents);
+  const [students] = useState<Student[]>(initialStudents);
   const [filter, setFilter] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -66,6 +67,12 @@ export const StudentTable: FC<StudentTableProps> = ({
     return [...filtered].sort((a, b) => {
       const aValue = a[sortKey];
       const bValue = b[sortKey];
+
+      if (aValue instanceof Date && bValue instanceof Date) {
+        return sortOrder === 'asc'
+          ? aValue.getTime() - bValue.getTime()
+          : bValue.getTime() - aValue.getTime();
+      }
 
       if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
@@ -116,6 +123,7 @@ export const StudentTable: FC<StudentTableProps> = ({
               {renderSortableHeader('name', 'Name')}
               {renderSortableHeader('studentId', 'Student ID')}
               {renderSortableHeader('course', 'Course')}
+              {renderSortableHeader('createdAt', 'Date Added')}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -125,6 +133,9 @@ export const StudentTable: FC<StudentTableProps> = ({
                 <TableCell className="font-medium">{student.name}</TableCell>
                 <TableCell>{student.studentId}</TableCell>
                 <TableCell>{student.course}</TableCell>
+                 <TableCell>
+                    {format(new Date(student.createdAt), 'PPP')}
+                  </TableCell>
                 <TableCell>
                   <Button
                     variant="ghost"

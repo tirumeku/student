@@ -4,4 +4,6 @@ export interface Student {
   studentId: string;
   course: string;
   interests: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
