@@ -18,14 +18,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals.push({
-        '@prisma/client': 'commonjs @prisma/client',
-      })
-    }
-    return config
-  },
 };
 
 export default nextConfig;

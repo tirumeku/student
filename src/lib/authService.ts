@@ -1,9 +1,19 @@
 
 'use server';
 
-import { prisma } from './db';
 import { z } from 'zod';
-import { User } from '@prisma/client';
+
+// Mock user data - in a real app, this would come from a database
+const users = [
+  {
+    id: 'b1e55c84-9055-4eb5-8bd4-a262538f7e66',
+    firstName: 'Admin',
+    lastName: 'User',
+    phoneNumber: '0989736223',
+    email: 'admin@example.com',
+    password: 'password', // In a real app, use a hashed password
+  }
+];
 
 const RegisterSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -35,45 +45,30 @@ export async function registerUser(userData: {
     };
   }
   
-  try {
-    const existingUser = await prisma.user.findFirst({
-        where: {
-            OR: [
-                { email: validatedFields.data.email },
-                { phoneNumber: validatedFields.data.phoneNumber },
-            ]
-        }
-    });
+  const existingUser = users.find(
+    (user) => user.email === validatedFields.data.email || user.phoneNumber === validatedFields.data.phoneNumber
+  );
 
-    if (existingUser) {
-        return {
-            isSuccess: false,
-            errors: { email: ['User with this email or phone number already exists.'] },
-            message: 'User already exists.'
-        }
-    }
-
-    const user = await prisma.user.create({
-      data: {
-        ...validatedFields.data,
-        // In a real app, hash the password before saving
-      },
-    });
-
-    return {
-      isSuccess: true,
-      accessToken: 'dummy-jwt-for-' + user.id, // Replace with real JWT logic
-      refreshToken: 'dummy-refresh-token',
-      errors: null,
-    };
-  } catch (error: any) {
-    return {
-      isSuccess: false,
-      accessToken: null,
-      refreshToken: null,
-      errors: [error.message || 'An unknown error occurred.'],
-    };
+  if (existingUser) {
+      return {
+          isSuccess: false,
+          errors: { general: ['User with this email or phone number already exists.'] },
+          message: 'User already exists.'
+      }
   }
+
+  const newUser = {
+    id: (users.length + 1).toString(),
+    ...validatedFields.data
+  };
+  users.push(newUser);
+
+  return {
+    isSuccess: true,
+    accessToken: 'dummy-jwt-for-' + newUser.id, // Replace with real JWT logic
+    refreshToken: 'dummy-refresh-token',
+    errors: null,
+  };
 }
 
 export async function login({
@@ -94,34 +89,25 @@ export async function login({
         }
     }
 
-  try {
-    const user = await prisma.user.findUnique({
-      where: { phoneNumber },
-    });
+  const user = users.find(
+    (u) => u.phoneNumber === phoneNumber
+  );
 
-    if (!user || user.password !== password) { // In real app, compare hashed passwords
-      return {
-        isSuccess: false,
-        accessToken: null,
-        refreshToken: null,
-        errors: ['Invalid phone number or password.'],
-      };
-    }
-
-    return {
-      isSuccess: true,
-      accessToken: 'dummy-jwt-for-' + user.id, // Replace with real JWT logic
-      refreshToken: 'dummy-refresh-token',
-      errors: null,
-    };
-  } catch (error: any) {
+  if (!user || user.password !== password) {
     return {
       isSuccess: false,
       accessToken: null,
       refreshToken: null,
-      errors: [error.message || 'An unknown server error occurred.'],
+      errors: ['Invalid phone number or password.'],
     };
   }
+
+  return {
+    isSuccess: true,
+    accessToken: 'dummy-jwt-for-' + user.id, // Replace with real JWT logic
+    refreshToken: 'dummy-refresh-token',
+    errors: null,
+  };
 }
 
 export async function logout(token: string, refreshToken: string) {
