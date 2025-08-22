@@ -1,6 +1,8 @@
+
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { createStudent, type State } from '@/lib/actions';
 import {
   Form,
@@ -38,7 +40,7 @@ function SubmitButton() {
 
 export function RegistrationForm() {
   const initialState: State = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(createStudent, initialState);
+  const [state, dispatch] = useActionState(createStudent, initialState);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
