@@ -2,7 +2,7 @@
 'use server';
 
 // NOTE: In a real app, you would want to move the base URL to an environment variable.
-const AUTH_API_URL = 'http://localhost:5160/api/Auth';
+const AUTH_API_URL = 'http://127.0.0.1:5160/api/Auth';
 
 export async function registerUser(userData: {
   firstName: string;
