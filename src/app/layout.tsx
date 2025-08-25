@@ -3,6 +3,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/header';
+import { Sidebar } from '@/components/sidebar';
 
 export const metadata: Metadata = {
   title: 'CampusConnect',
@@ -38,8 +39,13 @@ export default function RootLayout({
         )}
       >
         <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
+          <div className="flex">
+            <Sidebar />
+            <main className="flex-1">
+              <Header />
+              {children}
+            </main>
+          </div>
         </div>
         <Toaster />
       </body>
