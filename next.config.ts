@@ -19,17 +19,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
+  async redirects() {
     return [
-      {
-        source: '/dashboard',
-        destination: '/',
-      },
       {
         source: '/',
         destination: '/login',
+        permanent: true,
       },
-    ];
+    ]
   },
   devIndicators: {
     allowedDevOrigins: [
