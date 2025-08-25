@@ -60,7 +60,7 @@ export function UserRegistrationForm() {
           <Label htmlFor="firstName">First Name</Label>
           <Input
             id="firstName"
-            placeholder="John"
+            placeholder="tiru"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
@@ -70,7 +70,7 @@ export function UserRegistrationForm() {
           <Label htmlFor="lastName">Last Name</Label>
           <Input
             id="lastName"
-            placeholder="Doe"
+            placeholder="meku"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
