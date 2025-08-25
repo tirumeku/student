@@ -82,7 +82,7 @@ export function UserRegistrationForm() {
         <Input
           id="phoneNumber"
           type="tel"
-          placeholder="09123456789"
+          placeholder="0989736223"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           required

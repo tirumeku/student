@@ -58,7 +58,7 @@ export default function LoginPage() {
               <Input
                 id="phoneNumber"
                 type="tel"
-                placeholder="e.g. 09123456789"
+                placeholder="e.g. 0989736223"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
