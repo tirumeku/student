@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -43,10 +44,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl font-headline">Login</CardTitle>
+    <div className="flex justify-center items-center h-screen bg-muted/40">
+      <Card className="mx-auto max-w-sm w-full">
+        <CardHeader className="items-center text-center">
+          <Image
+            src="https://picsum.photos/100/100"
+            alt="CampusConnect Logo"
+            width={80}
+            height={80}
+            className="rounded-full mb-4"
+            data-ai-hint="logo abstract"
+          />
+          <CardTitle className="text-2xl font-headline">CampusConnect</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
