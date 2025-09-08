@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -17,8 +17,23 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal } from 'lucide-react';
 import { login } from '@/lib/authService';
+import { getBranding } from '@/lib/data';
 
 export default function LoginPage() {
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  
+  useEffect(() => {
+    async function fetchBranding() {
+      const branding = await getBranding();
+      setLogoUrl(branding.logoUrl);
+    }
+    fetchBranding();
+  }, []);
+
+  return <LoginForm logoUrl={logoUrl} />;
+}
+
+function LoginForm({ logoUrl }: { logoUrl: string | null }) {
   const [phoneNumber, setPhoneNumber] = useState('0989736223');
   const [password, setPassword] = useState('password');
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +63,7 @@ export default function LoginPage() {
       <Card className="mx-auto max-w-sm w-full">
         <CardHeader className="items-center text-center">
           <Image
-            src="/logo.png"
+            src={logoUrl || '/logo.png'}
             alt="CampusConnect Logo"
             width={80}
             height={80}

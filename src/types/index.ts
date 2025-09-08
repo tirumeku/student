@@ -16,3 +16,7 @@ export type StudentFirestore = Omit<Student, 'id' | 'createdAt' | 'updatedAt'> &
     createdAt: Timestamp;
     updatedAt: Timestamp;
 };
+
+export type Branding = {
+    logoUrl: string | null;
+};

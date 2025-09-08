@@ -1,6 +1,7 @@
 import { UserManagement } from '@/components/user-management';
 import { RoleManagement } from '@/components/role-management';
 import { UserRegistrationForm } from '@/components/user-registration-form';
+import { BrandingForm } from '@/components/branding-form';
 import {
   Tabs,
   TabsContent,
@@ -22,10 +23,11 @@ export default function SettingsPage() {
         Settings
       </h1>
       <Tabs defaultValue="user-management">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="user-management">User Management</TabsTrigger>
           <TabsTrigger value="role-management">Role Management</TabsTrigger>
           <TabsTrigger value="user-registration">User Registration</TabsTrigger>
+          <TabsTrigger value="branding">Branding</TabsTrigger>
         </TabsList>
 
         <TabsContent value="user-management">
@@ -66,6 +68,19 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <UserRegistrationForm />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="branding">
+          <Card>
+            <CardHeader>
+              <CardTitle>Branding</CardTitle>
+              <CardDescription>
+                Customize the look and feel of the application.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BrandingForm />
             </CardContent>
           </Card>
         </TabsContent>

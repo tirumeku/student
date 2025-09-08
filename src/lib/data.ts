@@ -1,6 +1,6 @@
 'use server';
 
-import type { Student } from '@/types';
+import type { Student, Branding } from '@/types';
 import { initialStudents } from './seed';
 
 // In-memory data store, initialized with seed data
@@ -10,6 +10,10 @@ let students: Student[] = initialStudents.map((student, index) => ({
   createdAt: new Date(`2023-09-0${index + 1}T10:00:00Z`),
   updatedAt: new Date(`2023-09-0${index + 1}T10:00:00Z`),
 }));
+
+let branding: Branding = {
+  logoUrl: null,
+};
 
 
 // Simulate async data fetching
@@ -36,4 +40,13 @@ export const addStudent = async (studentData: {
 
 export const getStudentById = async (id: string): Promise<Student | null> => {
     return students.find((student) => student.id === id) || null;
+}
+
+export const getBranding = async (): Promise<Branding> => {
+  return branding;
+}
+
+export const setBranding = async (newBranding: Partial<Branding>): Promise<Branding> => {
+  branding = { ...branding, ...newBranding };
+  return branding;
 }
