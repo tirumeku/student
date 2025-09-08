@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -7,7 +8,7 @@ import { redirect } from 'next/navigation';
 import { activityRecommender } from '@/ai/flows/activity-recommender';
 import type { Student } from '@/types';
 import type { ActivityRecommenderOutput } from '@/ai/flows/activity-recommender';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
 const FormSchema = z.object({
@@ -114,7 +115,11 @@ export async function uploadBranding(prevState: BrandingState, formData: FormDat
   try {
     const buffer = Buffer.from(await logo.arrayBuffer());
     const filename = `${Date.now()}-${logo.name}`;
-    const publicPath = join(process.cwd(), 'public', 'uploads', filename);
+    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    const publicPath = join(uploadDir, filename);
+
+    // Ensure the uploads directory exists
+    await mkdir(uploadDir, { recursive: true });
 
     await writeFile(publicPath, buffer);
     
